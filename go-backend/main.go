@@ -1,32 +1,31 @@
 package main
 
 import (
-	"log"
+	initalizers "go-backend/initializers"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 var db = make(map[string]string)
 
-// Função para carregar as variáveis de ambiente do arquivo .env
+// Função que é executada antes de iniciar o servidor
 func init() {
-	err := godotenv.Load()
-
-	if err != nil {
-		log.Fatal("Erro ao carregar o arquivo .env")
-	}
+	initalizers.LoadEnvVariables()  // Função para carregar as variáveis de ambiente do arquivo .env
+	initalizers.ConnectToDatabase() // Função para conectar ao banco de dados
 }
 
 func setupRouter() *gin.Engine {
-	// Disable Console Color
-	// gin.DisableConsoleColor()
 	r := gin.Default()
 
 	// Ping test
-	r.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "Vamo Grêmio!")
+	r.GET("/testdb", func(c *gin.Context) {
+		var response = initalizers.DB.Exec("SELECT 1") // Testando a conexão com o banco de dados
+		if response.Error != nil {
+			c.String(http.StatusInternalServerError, "Conexão com o banco de dados falhou: %v", response.Error)
+		} else {
+			c.String(http.StatusOK, "Conexão com o banco de dados estabelecida com sucesso!")
+		}
 	})
 
 	// Get user value
