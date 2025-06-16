@@ -1,0 +1,17 @@
+
+services:
+  db:
+    image: pgvector/pgvector:pg16  # Imagem com Postgres 16 e pgvector
+    container_name: go-rag-db-container
+    environment:
+      - POSTGRES_USER=goku
+      - POSTGRES_PASSWORD=kamehameha
+      - POSTGRES_DB=go-rag-db
+    ports:
+      - "5433:5432" # Porta 5433 do host mapeado para porta 5432 do container
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

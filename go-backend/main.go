@@ -1,6 +1,7 @@
 package main
 
 import (
+	"go-backend/controllers"
 	initalizers "go-backend/initializers"
 	"net/http"
 
@@ -18,15 +19,19 @@ func init() {
 func setupRouter() *gin.Engine {
 	r := gin.Default()
 
-	// Ping test
-	r.GET("/testdb", func(c *gin.Context) {
-		var response = initalizers.DB.Exec("SELECT 1") // Testando a conexão com o banco de dados
-		if response.Error != nil {
-			c.String(http.StatusInternalServerError, "Conexão com o banco de dados falhou: %v", response.Error)
-		} else {
-			c.String(http.StatusOK, "Conexão com o banco de dados estabelecida com sucesso!")
-		}
-	})
+	// Rotas users
+	r.POST("/users", controllers.CreateUser)
+	r.GET("/users", controllers.GetUsers)
+	r.GET("/users/:id", controllers.GetUserByID)
+	r.PATCH("/users/:id", controllers.UpdateUser)
+	r.DELETE("/users/:id", controllers.DeleteUser)
+
+	// Rotas datasets
+	r.POST("/datasets", controllers.CreateDataset)
+	r.GET("/datasets", controllers.GetDatasets)
+	r.GET("/datasets/:id", controllers.GetDatasetByID)
+	r.PATCH("/datasets/:id", controllers.UpdateDataset)
+	r.DELETE("/datasets/:id", controllers.DeleteDataset)
 
 	// Get user value
 	r.GET("/user/:name", func(c *gin.Context) {
@@ -79,6 +84,5 @@ func setupRouter() *gin.Engine {
 
 func main() {
 	r := setupRouter()
-	// Listen and Server in 0.0.0.0:8080
 	r.Run()
 }
