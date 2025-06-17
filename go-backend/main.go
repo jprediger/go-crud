@@ -14,10 +14,14 @@ var db = make(map[string]string)
 func init() {
 	initalizers.LoadEnvVariables()  // Função para carregar as variáveis de ambiente do arquivo .env
 	initalizers.ConnectToDatabase() // Função para conectar ao banco de dados
+	initalizers.LoadAwsProfile()    // Função para carregar o perfil AWS
 }
 
 func setupRouter() *gin.Engine {
 	r := gin.Default()
+
+	// Rota presigned-url
+	r.POST("/generate-upload-url", controllers.GenerateUploadURL)
 
 	// Rotas users
 	r.POST("/users", controllers.CreateUser)
@@ -32,6 +36,13 @@ func setupRouter() *gin.Engine {
 	r.GET("/datasets/:id", controllers.GetDatasetByID)
 	r.PATCH("/datasets/:id", controllers.UpdateDataset)
 	r.DELETE("/datasets/:id", controllers.DeleteDataset)
+
+	// Rotas dataSources
+	r.POST("/datasources", controllers.CreateDataSource)
+	r.GET("/datasources", controllers.GetDataSources)
+	r.GET("/datasources/:id", controllers.GetDataSourceByID)
+	r.PATCH("/datasources/:id", controllers.UpdateDataSource)
+	r.DELETE("/datasources/:id", controllers.DeleteDataSource)
 
 	// Get user value
 	r.GET("/user/:name", func(c *gin.Context) {

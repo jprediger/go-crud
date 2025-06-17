@@ -1,6 +1,7 @@
 package initalizers
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -17,9 +18,11 @@ func ConnectToDatabase() {
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
-		panic("Falha ao conectar ao banco de dados: " + err.Error())
+		log.Fatalf("Falha ao conectar ao banco de dados: %v", err.Error())
 	}
 
 	// Log na conexão bem-sucedida
-	log.Println("Conexão com o banco de dados estabelecida com sucesso")
+	fmt.Println("\n\n-------------------------------------")
+	fmt.Printf("Conexão com o banco de dados estabelecida com sucesso\n")
+	fmt.Println("-------------------------------------")
 }
