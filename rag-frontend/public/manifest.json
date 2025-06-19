@@ -1,6 +1,6 @@
 {
-  "short_name": "TanStack App",
-  "name": "Create TanStack App Sample",
+  "short_name": "GoRag",
+  "name": "GoRag - RAG Application",
   "icons": [
     {
       "src": "favicon.ico",

@@ -1,25 +1,32 @@
-import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
+import {
+  Outlet,
+  createRootRouteWithContext,
+  useNavigate,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-
-import Header from "../components/Header";
 
 import TanStackQueryLayout from "../integrations/tanstack-query/layout.tsx";
 
 import type { QueryClient } from "@tanstack/react-query";
 
 interface MyRouterContext {
-	queryClient: QueryClient;
+  queryClient: QueryClient;
 }
 
+import { AuthProvider } from "@/contexts/AuthContext.tsx"; // ajuste o caminho conforme seu projeto
+import { ThemeProvider } from "@/contexts/ThemeContext.tsx";
+
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-	component: () => (
-		<>
-			<Header />
-
-			<Outlet />
-			<TanStackRouterDevtools />
-
-			<TanStackQueryLayout />
-		</>
-	),
+  component: () => {
+    const navigate = useNavigate();
+    return (
+      <AuthProvider navigate={navigate}>
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <Outlet />
+          <TanStackRouterDevtools />
+          <TanStackQueryLayout />
+        </ThemeProvider>
+      </AuthProvider>
+    );
+  },
 });

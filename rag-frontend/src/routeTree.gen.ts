@@ -10,43 +10,89 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DemoTanstackQueryRouteImport } from './routes/demo.tanstack-query'
+import { Route as DatasetsIndexRouteImport } from './routes/datasets/index'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AuthEsqueciMinhaSenhaRouteImport } from './routes/auth/esqueci-minha-senha'
+import { Route as AuthConfirmarLoginRouteImport } from './routes/auth/confirmar-login'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
-  id: '/demo/tanstack-query',
-  path: '/demo/tanstack-query',
+const DatasetsIndexRoute = DatasetsIndexRouteImport.update({
+  id: '/datasets/',
+  path: '/datasets/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthEsqueciMinhaSenhaRoute = AuthEsqueciMinhaSenhaRouteImport.update({
+  id: '/auth/esqueci-minha-senha',
+  path: '/auth/esqueci-minha-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthConfirmarLoginRoute = AuthConfirmarLoginRouteImport.update({
+  id: '/auth/confirmar-login',
+  path: '/auth/confirmar-login',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/auth/confirmar-login': typeof AuthConfirmarLoginRoute
+  '/auth/esqueci-minha-senha': typeof AuthEsqueciMinhaSenhaRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/datasets': typeof DatasetsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/auth/confirmar-login': typeof AuthConfirmarLoginRoute
+  '/auth/esqueci-minha-senha': typeof AuthEsqueciMinhaSenhaRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/datasets': typeof DatasetsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/auth/confirmar-login': typeof AuthConfirmarLoginRoute
+  '/auth/esqueci-minha-senha': typeof AuthEsqueciMinhaSenhaRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/datasets/': typeof DatasetsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/demo/tanstack-query'
+  fullPaths:
+    | '/'
+    | '/auth/confirmar-login'
+    | '/auth/esqueci-minha-senha'
+    | '/auth/login'
+    | '/datasets'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/demo/tanstack-query'
-  id: '__root__' | '/' | '/demo/tanstack-query'
+  to:
+    | '/'
+    | '/auth/confirmar-login'
+    | '/auth/esqueci-minha-senha'
+    | '/auth/login'
+    | '/datasets'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth/confirmar-login'
+    | '/auth/esqueci-minha-senha'
+    | '/auth/login'
+    | '/datasets/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  AuthConfirmarLoginRoute: typeof AuthConfirmarLoginRoute
+  AuthEsqueciMinhaSenhaRoute: typeof AuthEsqueciMinhaSenhaRoute
+  AuthLoginRoute: typeof AuthLoginRoute
+  DatasetsIndexRoute: typeof DatasetsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,11 +104,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/tanstack-query': {
-      id: '/demo/tanstack-query'
-      path: '/demo/tanstack-query'
-      fullPath: '/demo/tanstack-query'
-      preLoaderRoute: typeof DemoTanstackQueryRouteImport
+    '/datasets/': {
+      id: '/datasets/'
+      path: '/datasets'
+      fullPath: '/datasets'
+      preLoaderRoute: typeof DatasetsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/esqueci-minha-senha': {
+      id: '/auth/esqueci-minha-senha'
+      path: '/auth/esqueci-minha-senha'
+      fullPath: '/auth/esqueci-minha-senha'
+      preLoaderRoute: typeof AuthEsqueciMinhaSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/confirmar-login': {
+      id: '/auth/confirmar-login'
+      path: '/auth/confirmar-login'
+      fullPath: '/auth/confirmar-login'
+      preLoaderRoute: typeof AuthConfirmarLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -70,7 +137,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  AuthConfirmarLoginRoute: AuthConfirmarLoginRoute,
+  AuthEsqueciMinhaSenhaRoute: AuthEsqueciMinhaSenhaRoute,
+  AuthLoginRoute: AuthLoginRoute,
+  DatasetsIndexRoute: DatasetsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

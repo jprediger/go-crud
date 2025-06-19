@@ -1,17 +1,77 @@
-import { Link } from "@tanstack/react-router";
+import { useAuth } from "@/contexts/AuthContext";
+import { Loader2 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ModeToggle } from "@/components/theme/ModeToggle";
+
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+
+import { useNavigate } from "@tanstack/react-router";
 
 export default function Header() {
-	return (
-		<header className="p-2 flex gap-2 bg-white text-black justify-between">
-			<nav className="flex flex-row">
-				<div className="px-2 font-bold">
-					<Link to="/">Home</Link>
-				</div>
+  const auth = useAuth();
+  const navigate = useNavigate();
 
-				<div className="px-2 font-bold">
-					<Link to="/demo/tanstack-query">TanStack Query</Link>
-				</div>
-			</nav>
-		</header>
-	);
+  if (auth.isAuthenticating) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin" />
+      </div>
+    );
+  }
+
+  // Função utilitária para pegar as iniciais
+  const getInitials = (name = "") => {
+    return name
+      .split(" ")
+      .map((n) => n[0]?.toUpperCase())
+      .join("")
+      .substring(0, 2);
+  };
+
+  return (
+    <header className="fixed top-0 left-0 w-full z-50 px-8 py-2 flex items-center justify-between">
+      <div className="mx-auto w-full max-w-7xl flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <img
+            src="/go-rag-logo.svg"
+            alt="Logo Supernova"
+            className="h-6 cursor-pointer"
+            onClick={() => navigate({ to: "/" })}
+          />
+        </div>
+        <div className="flex items-center gap-4">
+          <ModeToggle/>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Avatar className="cursor-pointer">
+                <AvatarImage />
+                <AvatarFallback>
+                  {getInitials(auth.user?.signInDetails.loginId || "U S")}
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>
+                {auth.user?.signInDetails.loginId}
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={auth.logout}
+                className="text-destructive focus:bg-red-100 focus:text-red-600 font-semibold cursor-pointer"
+              >
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+    </header>
+  );
 }
