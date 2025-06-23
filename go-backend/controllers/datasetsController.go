@@ -13,29 +13,37 @@ import (
 
 // DTOs para Dataset
 type CreateDatasetDTO struct {
-	Name        string `json:"name" binding:"required"`
-	Description string `json:"description" binding:"omitempty"`
-	UserID      uint   `json:"user_id" binding:"required"`
+	Name           string `json:"name" binding:"required"`
+	Description    string `json:"description" binding:"omitempty"`
+	OrganizationID uint   `json:"organization_id" binding:"required"`
 }
 
 type UpdateDatasetDTO struct {
-	Name        string `json:"name" binding:"omitempty"`
-	Description string `json:"description" binding:"omitempty"`
-	UserID      uint   `json:"user_id" binding:"omitempty"`
+	Name           string `json:"name" binding:"omitempty"`
+	Description    string `json:"description" binding:"omitempty"`
+	OrganizationID uint   `json:"organization_id" binding:"omitempty"`
 }
 
 type DatasetResponse struct {
-	ID          uint         `json:"id"`
-	Name        string       `json:"name"`
-	Hash        string       `json:"hash"`
-	Description string       `json:"description"`
-	User        UserResponse `json:"user"`
+	ID           uint                 `json:"id"`
+	Name         string               `json:"name"`
+	Hash         string               `json:"hash"`
+	Description  string               `json:"description"`
+	Organization OrganizationResponse `json:"organization"`
+}
+
+type CreateDatasetResponse struct {
+	ID             uint   `json:"id"`
+	Name           string `json:"name"`
+	Hash           string `json:"hash"`
+	Description    string `json:"description"`
+	OrganizationId uint   `json:"organization_id"`
 }
 
 // Buscar todos os datasets
 func GetDatasets(c *gin.Context) {
 	var datasets []models.Dataset
-	result := initalizers.DB.Preload("User").Find(&datasets)
+	result := initalizers.DB.Preload("Organization").Find(&datasets)
 	if result.Error != nil {
 		utils.ErrorResponse(c, "Erro ao buscar datasets", 500)
 		return
@@ -47,11 +55,11 @@ func GetDatasets(c *gin.Context) {
 			Name:        dataset.Name,
 			Hash:        dataset.Hash,
 			Description: dataset.Description,
-			User: UserResponse{
-				ID:       dataset.User.ID,
-				Username: dataset.User.Username,
-				Email:    dataset.User.Email,
-				Role:     dataset.User.Role,
+			Organization: OrganizationResponse{
+				ID:          dataset.Organization.ID,
+				Name:        dataset.Organization.Name,
+				CNPJ:        dataset.Organization.CNPJ,
+				RazaoSocial: dataset.Organization.RazaoSocial,
 			},
 		})
 	}
@@ -74,10 +82,10 @@ func CreateDataset(c *gin.Context) {
 	hash := uuid.New().String()
 
 	dataset := models.Dataset{
-		Name:        dto.Name,
-		Hash:        hash,
-		Description: dto.Description,
-		UserID:      dto.UserID,
+		Name:           dto.Name,
+		Hash:           hash,
+		Description:    dto.Description,
+		OrganizationID: dto.OrganizationID,
 	}
 
 	result := initalizers.DB.Create(&dataset)
@@ -90,21 +98,13 @@ func CreateDataset(c *gin.Context) {
 		return
 	}
 
-	// Recarrega o dataset atualizado com o usuário associado
-	initalizers.DB.Preload("User").First(&dataset, dataset.ID)
-
 	// Mapeia o dataset criado para a resposta
-	datasetResponse := DatasetResponse{
-		ID:          dataset.ID,
-		Name:        dataset.Name,
-		Hash:        dataset.Hash,
-		Description: dataset.Description,
-		User: UserResponse{
-			ID:       dataset.User.ID,
-			Username: dataset.User.Username,
-			Email:    dataset.User.Email,
-			Role:     dataset.User.Role,
-		},
+	datasetResponse := CreateDatasetResponse{
+		ID:             dataset.ID,
+		Name:           dataset.Name,
+		Hash:           dataset.Hash,
+		Description:    dataset.Description,
+		OrganizationId: dataset.OrganizationID,
 	}
 	utils.SuccessResponse(c, "Dataset criado com sucesso", datasetResponse)
 }
@@ -115,7 +115,7 @@ func GetDatasetByID(c *gin.Context) {
 	var dataset models.Dataset
 
 	// Busca o dataset pelo ID e pré-carrega o usuário associado
-	result := initalizers.DB.Preload("User").First(&dataset, datasetID)
+	result := initalizers.DB.Preload("Organization").First(&dataset, datasetID)
 	if result.Error != nil {
 		if utils.HandleDBError(c, result.Error) {
 			return
@@ -131,11 +131,11 @@ func GetDatasetByID(c *gin.Context) {
 		Name:        dataset.Name,
 		Hash:        dataset.Hash,
 		Description: dataset.Description,
-		User: UserResponse{
-			ID:       dataset.User.ID,
-			Username: dataset.User.Username,
-			Email:    dataset.User.Email,
-			Role:     dataset.User.Role,
+		Organization: OrganizationResponse{
+			ID:          dataset.Organization.ID,
+			Name:        dataset.Organization.Name,
+			CNPJ:        dataset.Organization.CNPJ,
+			RazaoSocial: dataset.Organization.RazaoSocial,
 		},
 	}
 	utils.SuccessResponse(c, "Dataset encontrado", datasetResponse)
@@ -156,7 +156,7 @@ func UpdateDataset(c *gin.Context) {
 	}
 
 	// Verifica se pelo menos um campo foi enviado
-	if dto.Name == "" && dto.Description == "" && dto.UserID == 0 {
+	if dto.Name == "" && dto.Description == "" && dto.OrganizationID == 0 {
 		utils.ErrorResponse(c, "Envie pelo menos um campo para atualizar", 400)
 		return
 	}
@@ -180,8 +180,8 @@ func UpdateDataset(c *gin.Context) {
 	if dto.Description != "" {
 		dataset.Description = dto.Description
 	}
-	if dto.UserID != 0 {
-		dataset.UserID = dto.UserID
+	if dto.OrganizationID != 0 {
+		dataset.OrganizationID = dto.OrganizationID
 	}
 
 	// Realiza a atualização do dataset
@@ -195,21 +195,13 @@ func UpdateDataset(c *gin.Context) {
 		return
 	}
 
-	// Recarrega o dataset atualizado com o usuário associado
-	initalizers.DB.Preload("User").First(&dataset, dataset.ID)
-
 	// Mapeia o dataset atualizado para a resposta
-	datasetResponse := DatasetResponse{
-		ID:          dataset.ID,
-		Name:        dataset.Name,
-		Hash:        dataset.Hash,
-		Description: dataset.Description,
-		User: UserResponse{
-			ID:       dataset.User.ID,
-			Username: dataset.User.Username,
-			Email:    dataset.User.Email,
-			Role:     dataset.User.Role,
-		},
+	datasetResponse := CreateDatasetResponse{
+		ID:             dataset.ID,
+		Name:           dataset.Name,
+		Hash:           dataset.Hash,
+		Description:    dataset.Description,
+		OrganizationId: dataset.OrganizationID,
 	}
 	utils.SuccessResponse(c, "Dataset atualizado com sucesso", datasetResponse)
 }
@@ -241,21 +233,13 @@ func DeleteDataset(c *gin.Context) {
 		return
 	}
 
-	// Recarrega o dataset atualizado com o usuário associado
-	initalizers.DB.Unscoped().Preload("User").First(&dataset, dataset.ID)
-
 	// Mapeia o dataset deletado para a resposta
-	datasetResponse := DatasetResponse{
-		ID:          dataset.ID,
-		Name:        dataset.Name,
-		Hash:        dataset.Hash,
-		Description: dataset.Description,
-		User: UserResponse{
-			ID:       dataset.User.ID,
-			Username: dataset.User.Username,
-			Email:    dataset.User.Email,
-			Role:     dataset.User.Role,
-		},
+	datasetResponse := CreateDatasetResponse{
+		ID:             dataset.ID,
+		Name:           dataset.Name,
+		Hash:           dataset.Hash,
+		Description:    dataset.Description,
+		OrganizationId: dataset.OrganizationID,
 	}
 
 	utils.SuccessResponse(c, "Dataset deletado com sucesso", &datasetResponse)

@@ -18,10 +18,8 @@ func main() {
 		&models.Dataset{},
 		&models.DataSource{},
 		&models.Chunk{},
-		&models.User{},
+		&models.Organization{},
 	)
-	// Cria o índice único para o campo email na tabela users, considerando apenas registros não deletados
-	initalizers.DB.Exec("CREATE UNIQUE INDEX IF NOT EXISTS unique_email_not_deleted ON users (email) WHERE deleted_at IS NULL;")
 
 	if err != nil {
 		panic("Falha ao migrar banco de dados: " + err.Error())

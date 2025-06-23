@@ -3,7 +3,7 @@ package controllers
 import (
 	"context"
 	initalizers "go-backend/initializers"
-	"go-backend/utils"
+	utils "go-backend/utils"
 	"log"
 	"os"
 	"time"

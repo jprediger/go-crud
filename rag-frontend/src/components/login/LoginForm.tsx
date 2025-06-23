@@ -5,26 +5,26 @@ import { useAuth } from "@/contexts/AuthContext"; // Ajuste o caminho
 
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-    loginFormSchema,
-    type LoginFormValues,
+  loginFormSchema,
+  type LoginFormValues,
 } from "@/components/login/LoginFormSchema"; // Assumindo que este arquivo existe
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 
@@ -32,6 +32,7 @@ import { toast } from "sonner";
 
 const LoginForm = () => {
   const auth = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<LoginFormValues>({
@@ -49,8 +50,14 @@ const LoginForm = () => {
         username: data.email,
         password: data.password,
       });
+      // se sucesso, redireciona para a página inicial ou outra página
+      navigate({
+        to: "/",
+        replace: true,
+      });
     } catch (error) {
-      toast.error(
+      console.error("Erro ao fazer login:", error);
+      toast.warning(
         "Erro ao fazer login. Verifique suas credenciais e tente novamente.",
         {
           position: "top-center",

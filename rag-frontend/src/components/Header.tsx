@@ -35,6 +35,12 @@ export default function Header() {
       .substring(0, 2);
   };
 
+  const handleLogoutClick = () => {
+    auth.logout();
+    // Redireciona para a página de login após o logout
+    navigate({ to: "/auth/login", replace: true });
+  }
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 px-8 py-2 flex items-center justify-between">
       <div className="mx-auto w-full max-w-7xl flex items-center justify-between">
@@ -63,7 +69,7 @@ export default function Header() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={auth.logout}
+                onClick={handleLogoutClick}
                 className="text-destructive focus:bg-red-100 focus:text-red-600 font-semibold cursor-pointer"
               >
                 Logout

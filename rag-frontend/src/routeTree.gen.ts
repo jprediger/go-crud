@@ -9,20 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DatasetsIndexRouteImport } from './routes/datasets/index'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthEsqueciMinhaSenhaRouteImport } from './routes/auth/esqueci-minha-senha'
 import { Route as AuthConfirmarLoginRouteImport } from './routes/auth/confirmar-login'
+import { Route as AuthenticatedDatasetsIndexRouteImport } from './routes/_authenticated/datasets/index'
+import { Route as AuthenticatedDatasetsDatasetIdRouteImport } from './routes/_authenticated/datasets/$datasetId'
 
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DatasetsIndexRoute = DatasetsIndexRouteImport.update({
-  id: '/datasets/',
-  path: '/datasets/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
@@ -40,28 +41,44 @@ const AuthConfirmarLoginRoute = AuthConfirmarLoginRouteImport.update({
   path: '/auth/confirmar-login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDatasetsIndexRoute =
+  AuthenticatedDatasetsIndexRouteImport.update({
+    id: '/datasets/',
+    path: '/datasets/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDatasetsDatasetIdRoute =
+  AuthenticatedDatasetsDatasetIdRouteImport.update({
+    id: '/datasets/$datasetId',
+    path: '/datasets/$datasetId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth/confirmar-login': typeof AuthConfirmarLoginRoute
   '/auth/esqueci-minha-senha': typeof AuthEsqueciMinhaSenhaRoute
   '/auth/login': typeof AuthLoginRoute
-  '/datasets': typeof DatasetsIndexRoute
+  '/datasets/$datasetId': typeof AuthenticatedDatasetsDatasetIdRoute
+  '/datasets': typeof AuthenticatedDatasetsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth/confirmar-login': typeof AuthConfirmarLoginRoute
   '/auth/esqueci-minha-senha': typeof AuthEsqueciMinhaSenhaRoute
   '/auth/login': typeof AuthLoginRoute
-  '/datasets': typeof DatasetsIndexRoute
+  '/datasets/$datasetId': typeof AuthenticatedDatasetsDatasetIdRoute
+  '/datasets': typeof AuthenticatedDatasetsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth/confirmar-login': typeof AuthConfirmarLoginRoute
   '/auth/esqueci-minha-senha': typeof AuthEsqueciMinhaSenhaRoute
   '/auth/login': typeof AuthLoginRoute
-  '/datasets/': typeof DatasetsIndexRoute
+  '/_authenticated/datasets/$datasetId': typeof AuthenticatedDatasetsDatasetIdRoute
+  '/_authenticated/datasets/': typeof AuthenticatedDatasetsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -70,6 +87,7 @@ export interface FileRouteTypes {
     | '/auth/confirmar-login'
     | '/auth/esqueci-minha-senha'
     | '/auth/login'
+    | '/datasets/$datasetId'
     | '/datasets'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -77,38 +95,41 @@ export interface FileRouteTypes {
     | '/auth/confirmar-login'
     | '/auth/esqueci-minha-senha'
     | '/auth/login'
+    | '/datasets/$datasetId'
     | '/datasets'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/auth/confirmar-login'
     | '/auth/esqueci-minha-senha'
     | '/auth/login'
-    | '/datasets/'
+    | '/_authenticated/datasets/$datasetId'
+    | '/_authenticated/datasets/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthConfirmarLoginRoute: typeof AuthConfirmarLoginRoute
   AuthEsqueciMinhaSenhaRoute: typeof AuthEsqueciMinhaSenhaRoute
   AuthLoginRoute: typeof AuthLoginRoute
-  DatasetsIndexRoute: typeof DatasetsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/datasets/': {
-      id: '/datasets/'
-      path: '/datasets'
-      fullPath: '/datasets'
-      preLoaderRoute: typeof DatasetsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/login': {
@@ -132,15 +153,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthConfirmarLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/datasets/': {
+      id: '/_authenticated/datasets/'
+      path: '/datasets'
+      fullPath: '/datasets'
+      preLoaderRoute: typeof AuthenticatedDatasetsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/datasets/$datasetId': {
+      id: '/_authenticated/datasets/$datasetId'
+      path: '/datasets/$datasetId'
+      fullPath: '/datasets/$datasetId'
+      preLoaderRoute: typeof AuthenticatedDatasetsDatasetIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedDatasetsDatasetIdRoute: typeof AuthenticatedDatasetsDatasetIdRoute
+  AuthenticatedDatasetsIndexRoute: typeof AuthenticatedDatasetsIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDatasetsDatasetIdRoute: AuthenticatedDatasetsDatasetIdRoute,
+  AuthenticatedDatasetsIndexRoute: AuthenticatedDatasetsIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthConfirmarLoginRoute: AuthConfirmarLoginRoute,
   AuthEsqueciMinhaSenhaRoute: AuthEsqueciMinhaSenhaRoute,
   AuthLoginRoute: AuthLoginRoute,
-  DatasetsIndexRoute: DatasetsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

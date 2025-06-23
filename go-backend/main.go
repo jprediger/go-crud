@@ -5,6 +5,7 @@ import (
 	initalizers "go-backend/initializers"
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,15 +21,23 @@ func init() {
 func setupRouter() *gin.Engine {
 	r := gin.Default()
 
+	// Adicione o middleware CORS aqui
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:3001"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
+		AllowHeaders:     []string{"Origin", "Content-Type"},
+		AllowCredentials: true,
+	}))
+
 	// Rota presigned-url
 	r.POST("/generate-upload-url", controllers.GenerateUploadURL)
 
 	// Rotas users
-	r.POST("/users", controllers.CreateUser)
-	r.GET("/users", controllers.GetUsers)
-	r.GET("/users/:id", controllers.GetUserByID)
-	r.PATCH("/users/:id", controllers.UpdateUser)
-	r.DELETE("/users/:id", controllers.DeleteUser)
+	r.POST("/organizations", controllers.CreateOrganization)
+	r.GET("/organizations", controllers.GetOrganizations)
+	r.GET("/organizations/:id", controllers.GetOrganizationByID)
+	r.PATCH("/organizations/:id", controllers.UpdateOrganization)
+	r.DELETE("/organizations/:id", controllers.DeleteOrganization)
 
 	// Rotas datasets
 	r.POST("/datasets", controllers.CreateDataset)
@@ -43,17 +52,6 @@ func setupRouter() *gin.Engine {
 	r.GET("/datasources/:id", controllers.GetDataSourceByID)
 	r.PATCH("/datasources/:id", controllers.UpdateDataSource)
 	r.DELETE("/datasources/:id", controllers.DeleteDataSource)
-
-	// Get user value
-	r.GET("/user/:name", func(c *gin.Context) {
-		user := c.Params.ByName("name")
-		value, ok := db[user]
-		if ok {
-			c.JSON(http.StatusOK, gin.H{"user": user, "value": value})
-		} else {
-			c.JSON(http.StatusOK, gin.H{"user": user, "status": "no value"})
-		}
-	})
 
 	// Authorized group (uses gin.BasicAuth() middleware)
 	// Same than:

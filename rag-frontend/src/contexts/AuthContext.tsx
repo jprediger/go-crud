@@ -39,11 +39,9 @@ import type {
   //ResendSignUpCodeInput,
   ResetPasswordInput,
   ConfirmResetPasswordInput,
+  SignInOutput,
   //UpdatePasswordInput,
 } from "aws-amplify/auth";
-
-// Tipos de navegação do React Router
-import type { NavigateOptions } from "@tanstack/react-router";
 
 // Tipos
 interface AuthUser {
@@ -59,7 +57,7 @@ interface AuthContextType {
   isLoading: boolean; // Verificação inicial de usuário
   isAuthenticating: boolean; // Estado durante login/logout
   error: string | null;
-  login: (input: SignInInput) => Promise<void>;
+  login: (input: SignInInput) => Promise<SignInOutput | void>;
   logout: () => Promise<void>;
   confirmSignInHandler: (
     nextStep: string,
@@ -71,10 +69,6 @@ interface AuthContextType {
   ) => Promise<void>;
 }
 
-interface AuthProviderProps {
-  navigate: (opts: NavigateOptions) => void;
-  children: ReactNode;
-}
 
 // === Devolve o ID Token JWT ou null ===
 export async function getJwtToken(): Promise<string | null> {
@@ -101,7 +95,7 @@ export async function getAuthHeaders(): Promise<Record<string, string>> {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: FC<AuthProviderProps> = ({ navigate, children }) => {
+export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isAuthenticating, setIsAuthenticating] = useState<boolean>(false);
@@ -180,34 +174,20 @@ export const AuthProvider: FC<AuthProviderProps> = ({ navigate, children }) => {
     }
   };
 
-  // Função de login
   const login = async (input: SignInInput) => {
     setIsAuthenticating(true);
     setError(null);
     try {
-      if (user) { // Se já estiver autenticado, desloga
+      if (user) {
         await signOut();
         setUser(null);
       }
-      const { isSignedIn, nextStep } = await signIn(input);
+      const output = await signIn(input);
 
-      // Navega para tela de dashboard se autenticado
-      if (isSignedIn) {
-        checkCurrentUser(); // Atualiza o usuário após login
-        navigate({
-          to: "/",
-          replace: true,
-        });
-      } else if (nextStep?.signInStep) {
-        if (
-          nextStep.signInStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED"
-        ) {
-          navigate({
-            to: "/auth/confirmar-login",
-            replace: true,
-          });
-        }
-      }
+      checkCurrentUser(); // Atualiza o usuário após login
+      
+      return output; 
+
     } catch (err: any) {
       setError(err.message || "Erro ao tentar fazer login.");
       setUser(null);
@@ -217,25 +197,13 @@ export const AuthProvider: FC<AuthProviderProps> = ({ navigate, children }) => {
     }
   };
 
-  const confirmSignInHandler = async (
-    nextStep: string,
-    challengeResponse: string
-  ) => {
+  const confirmSignInHandler = async (challengeResponse: string) => {
     setIsAuthenticating(true);
     setError(null);
     try {
-      if (!nextStep || nextStep === "") {
-        throw new Error("nextStep não fornecido para confirmação de login.");
-      } else if (nextStep === "CONFIRM_SIGN_IN_WITH_PASSWORD") {
-        await confirmSignIn({
-          challengeResponse: challengeResponse,
-        });
-        checkCurrentUser();
-        navigate({
-          to: "/",
-          replace: true,
-        });
-      }
+      await confirmSignIn({ challengeResponse });
+      // O Hub listener vai pegar o evento "signedIn" e atualizar o usuário.
+      // O Router irá redirecionar automaticamente se o usuário estava tentando acessar uma rota protegida.
     } catch (err: any) {
       setError(err.message || "Erro ao tentar confirmar login.");
       throw err;
@@ -268,10 +236,6 @@ export const AuthProvider: FC<AuthProviderProps> = ({ navigate, children }) => {
     try {
       await confirmResetPassword(input);
       // Aqui você pode navegar para a página de login ou mostrar uma mensagem
-      navigate({
-        to: "/auth/login",
-        replace: true,
-      });
     } catch (err: any) {
       setError(
         err.message || "Erro ao tentar confirmar a redefinição de senha."
@@ -282,19 +246,16 @@ export const AuthProvider: FC<AuthProviderProps> = ({ navigate, children }) => {
     }
   };
 
-  // Função de logout
   const logout = async () => {
     setIsAuthenticating(true);
     setError(null);
     try {
       await signOut();
+      setUser(null);
 
-      if (!user) {
-        navigate({
-          to: "/auth/login",
-          replace: true,
-        });
-      }
+      // O Hub listener vai definir o usuário como null.
+      // O Router, ao ver que o usuário não está mais autenticado em uma rota protegida,
+      // fará o redirecionamento via beforeLoad.
     } catch (err: any) {
       setError(err.message || "Erro ao tentar fazer logout.");
       throw err;
