@@ -54,6 +54,7 @@ interface GenericTableProps<TData, TValue> {
   handleRowClick?: (row: TData) => void; // Callback opcional para lidar com cliques na linha
   dataName?: string; // Nome do registro, usado para mensagens de feedback
   handleSelectionChange?: (selectedRows: TData[]) => void; // ADICIONE ESTA LINHA
+  defaultSort?: SortingState; // Adicione esta linha
 }
 
 export function GenericTable<TData, TValue>({
@@ -62,8 +63,10 @@ export function GenericTable<TData, TValue>({
   isLoading = false,
   dataName = "registro",
   handleSelectionChange,
+  defaultSort = [], // valor padrão vazio
 }: GenericTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [sorting, setSorting] = React.useState<SortingState>(defaultSort);
+  console.log("Sorting state:", sorting);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(

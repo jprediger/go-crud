@@ -21,7 +21,7 @@ func init() {
 func setupRouter() *gin.Engine {
 	r := gin.Default()
 
-	// Adicione o middleware CORS aqui
+	// Configuração do CORS com Middleware
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:3001"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"},

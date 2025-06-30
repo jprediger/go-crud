@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	aws "go-backend/aws"
 	initalizers "go-backend/initializers"
 	models "go-backend/models"
 	utils "go-backend/utils"
@@ -31,6 +32,7 @@ type DataSourceResponse struct {
 	Type      string  `json:"type"`
 	ObjectKey string  `json:"object_key"`        // Caminho do arquivo no S3
 	Summary   *string `json:"summary,omitempty"` // Resumo do conteúdo, opcional
+	CreatedAt string  `json:"created_at"`        // Data de criação
 }
 
 // --- Funções do Controller ---
@@ -43,9 +45,9 @@ func GetDataSources(c *gin.Context) {
 	query := initalizers.DB
 
 	// Filtra por dataset_id se o parâmetro for fornecido na query string
-	datasetID := c.Query("id")
+	datasetID := c.Query("dataset_id")
 	if datasetID != "" {
-		query = query.Where("id = ?", datasetID)
+		query = query.Where("dataset_id = ?", datasetID)
 	}
 
 	// Executa a busca
@@ -70,6 +72,7 @@ func GetDataSources(c *gin.Context) {
 			Type:      ds.Type,
 			ObjectKey: ds.ObjectKey, // Inclui o caminho do arquivo no S3
 			Summary:   ds.Summary,
+			CreatedAt: ds.CreatedAt.Format("02-01-2006 15:04:05"), // Formata a data de criação
 		})
 	}
 	utils.SuccessResponse(c, "DataSources encontrados", resp)
@@ -205,11 +208,23 @@ func DeleteDataSource(c *gin.Context) {
 		return
 	}
 
+	// Delega a lógica de deleção para a camada de serviço
+	if dataSource.ObjectKey != "" { // Garante que só tentamos deletar se houver uma chave
+		err := aws.DeleteS3Object(dataSource.ObjectKey)
+		if err != nil {
+			// Se a deleção no S3 falhar, NÃO continuamos para deletar o registro no banco.
+			// Isso evita deixar um registro "órfão" no banco de dados.
+			utils.ErrorResponse(c, "Erro ao deletar o arquivo associado no S3", 500)
+			return
+		}
+	}
+
 	// Deleta o DataSource (e o GORM cuidará do soft delete, se habilitado)
 	deleteResult := initalizers.DB.Delete(&dataSource)
 	if deleteResult.Error != nil {
-		utils.ErrorResponse(c, "Erro ao deletar DataSource", 500)
-		log.Println("[ATENÇÃO] Erro não tratado:", deleteResult.Error)
+		log.Printf("[ERRO CRÍTICO] O objeto S3 '%s' foi deletado, mas falhou ao deletar o registro do DataSource ID '%s' do banco. Erro: %v",
+			dataSource.ObjectKey, dataSourceID, deleteResult.Error)
+		utils.ErrorResponse(c, "Erro ao deletar o registro do DataSource após remover o arquivo", 500)
 		return
 	}
 

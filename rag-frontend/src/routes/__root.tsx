@@ -18,7 +18,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     return (
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <Outlet />
-        <TanStackRouterDevtools />
         <TanStackQueryLayout />
       </ThemeProvider>
     );

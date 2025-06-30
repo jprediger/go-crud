@@ -46,6 +46,7 @@ import type {
 // Tipos
 interface AuthUser {
   username: string;
+  userEmail?: string; // Email do usuário, opcional
   userId: string;
   signInDetails?: any; 
   userRole?: string | number | true;
@@ -159,8 +160,11 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         userFilial = undefined; // Define uma filial padrão se não for string
       }
 
+      console.log(cognitoUser)
+
       setUser({
         username: cognitoUser.username,
+        userEmail: cognitoUser.signInDetails?.loginId,
         userId: cognitoUser.userId,
         signInDetails: cognitoUser.signInDetails,
         userRole: userRole,

@@ -14,8 +14,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthEsqueciMinhaSenhaRouteImport } from './routes/auth/esqueci-minha-senha'
 import { Route as AuthConfirmarLoginRouteImport } from './routes/auth/confirmar-login'
-import { Route as AuthenticatedDatasetsIndexRouteImport } from './routes/_authenticated/datasets/index'
-import { Route as AuthenticatedDatasetsDatasetIdRouteImport } from './routes/_authenticated/datasets/$datasetId'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedSearchRouteImport } from './routes/_authenticated/search'
+import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/help'
+import { Route as AuthenticatedDatasetsRouteImport } from './routes/_authenticated/datasets'
+import { Route as AuthenticatedDatasetDatasetIdDocumentsRouteImport } from './routes/_authenticated/dataset/$datasetId.documents'
+import { Route as AuthenticatedDatasetDatasetIdConnectionsRouteImport } from './routes/_authenticated/dataset/$datasetId.connections'
+import { Route as AuthenticatedDatasetDatasetIdChunksRouteImport } from './routes/_authenticated/dataset/$datasetId.chunks'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -41,71 +46,127 @@ const AuthConfirmarLoginRoute = AuthConfirmarLoginRouteImport.update({
   path: '/auth/confirmar-login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedDatasetsIndexRoute =
-  AuthenticatedDatasetsIndexRouteImport.update({
-    id: '/datasets/',
-    path: '/datasets/',
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSearchRoute = AuthenticatedSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedHelpRoute = AuthenticatedHelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDatasetsRoute = AuthenticatedDatasetsRouteImport.update({
+  id: '/datasets',
+  path: '/datasets',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDatasetDatasetIdDocumentsRoute =
+  AuthenticatedDatasetDatasetIdDocumentsRouteImport.update({
+    id: '/dataset/$datasetId/documents',
+    path: '/dataset/$datasetId/documents',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedDatasetsDatasetIdRoute =
-  AuthenticatedDatasetsDatasetIdRouteImport.update({
-    id: '/datasets/$datasetId',
-    path: '/datasets/$datasetId',
+const AuthenticatedDatasetDatasetIdConnectionsRoute =
+  AuthenticatedDatasetDatasetIdConnectionsRouteImport.update({
+    id: '/dataset/$datasetId/connections',
+    path: '/dataset/$datasetId/connections',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDatasetDatasetIdChunksRoute =
+  AuthenticatedDatasetDatasetIdChunksRouteImport.update({
+    id: '/dataset/$datasetId/chunks',
+    path: '/dataset/$datasetId/chunks',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/datasets': typeof AuthenticatedDatasetsRoute
+  '/help': typeof AuthenticatedHelpRoute
+  '/search': typeof AuthenticatedSearchRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/auth/confirmar-login': typeof AuthConfirmarLoginRoute
   '/auth/esqueci-minha-senha': typeof AuthEsqueciMinhaSenhaRoute
   '/auth/login': typeof AuthLoginRoute
-  '/datasets/$datasetId': typeof AuthenticatedDatasetsDatasetIdRoute
-  '/datasets': typeof AuthenticatedDatasetsIndexRoute
+  '/dataset/$datasetId/chunks': typeof AuthenticatedDatasetDatasetIdChunksRoute
+  '/dataset/$datasetId/connections': typeof AuthenticatedDatasetDatasetIdConnectionsRoute
+  '/dataset/$datasetId/documents': typeof AuthenticatedDatasetDatasetIdDocumentsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/datasets': typeof AuthenticatedDatasetsRoute
+  '/help': typeof AuthenticatedHelpRoute
+  '/search': typeof AuthenticatedSearchRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/auth/confirmar-login': typeof AuthConfirmarLoginRoute
   '/auth/esqueci-minha-senha': typeof AuthEsqueciMinhaSenhaRoute
   '/auth/login': typeof AuthLoginRoute
-  '/datasets/$datasetId': typeof AuthenticatedDatasetsDatasetIdRoute
-  '/datasets': typeof AuthenticatedDatasetsIndexRoute
+  '/dataset/$datasetId/chunks': typeof AuthenticatedDatasetDatasetIdChunksRoute
+  '/dataset/$datasetId/connections': typeof AuthenticatedDatasetDatasetIdConnectionsRoute
+  '/dataset/$datasetId/documents': typeof AuthenticatedDatasetDatasetIdDocumentsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_authenticated/datasets': typeof AuthenticatedDatasetsRoute
+  '/_authenticated/help': typeof AuthenticatedHelpRoute
+  '/_authenticated/search': typeof AuthenticatedSearchRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/auth/confirmar-login': typeof AuthConfirmarLoginRoute
   '/auth/esqueci-minha-senha': typeof AuthEsqueciMinhaSenhaRoute
   '/auth/login': typeof AuthLoginRoute
-  '/_authenticated/datasets/$datasetId': typeof AuthenticatedDatasetsDatasetIdRoute
-  '/_authenticated/datasets/': typeof AuthenticatedDatasetsIndexRoute
+  '/_authenticated/dataset/$datasetId/chunks': typeof AuthenticatedDatasetDatasetIdChunksRoute
+  '/_authenticated/dataset/$datasetId/connections': typeof AuthenticatedDatasetDatasetIdConnectionsRoute
+  '/_authenticated/dataset/$datasetId/documents': typeof AuthenticatedDatasetDatasetIdDocumentsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/datasets'
+    | '/help'
+    | '/search'
+    | '/settings'
     | '/auth/confirmar-login'
     | '/auth/esqueci-minha-senha'
     | '/auth/login'
-    | '/datasets/$datasetId'
-    | '/datasets'
+    | '/dataset/$datasetId/chunks'
+    | '/dataset/$datasetId/connections'
+    | '/dataset/$datasetId/documents'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/datasets'
+    | '/help'
+    | '/search'
+    | '/settings'
     | '/auth/confirmar-login'
     | '/auth/esqueci-minha-senha'
     | '/auth/login'
-    | '/datasets/$datasetId'
-    | '/datasets'
+    | '/dataset/$datasetId/chunks'
+    | '/dataset/$datasetId/connections'
+    | '/dataset/$datasetId/documents'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/_authenticated/datasets'
+    | '/_authenticated/help'
+    | '/_authenticated/search'
+    | '/_authenticated/settings'
     | '/auth/confirmar-login'
     | '/auth/esqueci-minha-senha'
     | '/auth/login'
-    | '/_authenticated/datasets/$datasetId'
-    | '/_authenticated/datasets/'
+    | '/_authenticated/dataset/$datasetId/chunks'
+    | '/_authenticated/dataset/$datasetId/connections'
+    | '/_authenticated/dataset/$datasetId/documents'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -153,31 +214,79 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthConfirmarLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/datasets/': {
-      id: '/_authenticated/datasets/'
-      path: '/datasets'
-      fullPath: '/datasets'
-      preLoaderRoute: typeof AuthenticatedDatasetsIndexRouteImport
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/datasets/$datasetId': {
-      id: '/_authenticated/datasets/$datasetId'
-      path: '/datasets/$datasetId'
-      fullPath: '/datasets/$datasetId'
-      preLoaderRoute: typeof AuthenticatedDatasetsDatasetIdRouteImport
+    '/_authenticated/search': {
+      id: '/_authenticated/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof AuthenticatedSearchRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/help': {
+      id: '/_authenticated/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof AuthenticatedHelpRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/datasets': {
+      id: '/_authenticated/datasets'
+      path: '/datasets'
+      fullPath: '/datasets'
+      preLoaderRoute: typeof AuthenticatedDatasetsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dataset/$datasetId/documents': {
+      id: '/_authenticated/dataset/$datasetId/documents'
+      path: '/dataset/$datasetId/documents'
+      fullPath: '/dataset/$datasetId/documents'
+      preLoaderRoute: typeof AuthenticatedDatasetDatasetIdDocumentsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dataset/$datasetId/connections': {
+      id: '/_authenticated/dataset/$datasetId/connections'
+      path: '/dataset/$datasetId/connections'
+      fullPath: '/dataset/$datasetId/connections'
+      preLoaderRoute: typeof AuthenticatedDatasetDatasetIdConnectionsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dataset/$datasetId/chunks': {
+      id: '/_authenticated/dataset/$datasetId/chunks'
+      path: '/dataset/$datasetId/chunks'
+      fullPath: '/dataset/$datasetId/chunks'
+      preLoaderRoute: typeof AuthenticatedDatasetDatasetIdChunksRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
   }
 }
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedDatasetsDatasetIdRoute: typeof AuthenticatedDatasetsDatasetIdRoute
-  AuthenticatedDatasetsIndexRoute: typeof AuthenticatedDatasetsIndexRoute
+  AuthenticatedDatasetsRoute: typeof AuthenticatedDatasetsRoute
+  AuthenticatedHelpRoute: typeof AuthenticatedHelpRoute
+  AuthenticatedSearchRoute: typeof AuthenticatedSearchRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedDatasetDatasetIdChunksRoute: typeof AuthenticatedDatasetDatasetIdChunksRoute
+  AuthenticatedDatasetDatasetIdConnectionsRoute: typeof AuthenticatedDatasetDatasetIdConnectionsRoute
+  AuthenticatedDatasetDatasetIdDocumentsRoute: typeof AuthenticatedDatasetDatasetIdDocumentsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedDatasetsDatasetIdRoute: AuthenticatedDatasetsDatasetIdRoute,
-  AuthenticatedDatasetsIndexRoute: AuthenticatedDatasetsIndexRoute,
+  AuthenticatedDatasetsRoute: AuthenticatedDatasetsRoute,
+  AuthenticatedHelpRoute: AuthenticatedHelpRoute,
+  AuthenticatedSearchRoute: AuthenticatedSearchRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedDatasetDatasetIdChunksRoute:
+    AuthenticatedDatasetDatasetIdChunksRoute,
+  AuthenticatedDatasetDatasetIdConnectionsRoute:
+    AuthenticatedDatasetDatasetIdConnectionsRoute,
+  AuthenticatedDatasetDatasetIdDocumentsRoute:
+    AuthenticatedDatasetDatasetIdDocumentsRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

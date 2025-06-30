@@ -21,7 +21,7 @@ export default function DatasetsPage() {
     // Aqui você pode usar o roteamento para navegar para a página de detalhes do dataset
     // Por exemplo, usando tanstack-router
     navigate({
-      to: `/datasets/${row.id}`,
+      to: `/dataset/${row.id}/documents`,
       params: { datasetId: row.id.toString() },
     });
   };

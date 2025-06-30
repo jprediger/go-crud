@@ -114,8 +114,9 @@ func GetDatasetByID(c *gin.Context) {
 	datasetID := c.Param("id")
 	var dataset models.Dataset
 
-	// Busca o dataset pelo ID e pré-carrega o usuário associado
+	// Busca o dataset pelo ID e pré-carrega a organização associada
 	result := initalizers.DB.Preload("Organization").First(&dataset, datasetID)
+	
 	if result.Error != nil {
 		if utils.HandleDBError(c, result.Error) {
 			return
