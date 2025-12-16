@@ -13,5 +13,22 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  backend:
+    build:
+      context: ./go-backend
+      dockerfile: Dockerfile
+    container_name: go-backend-container
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://goku:kamehameha@db:5432/go-rag-db?sslmode=disable
+    ports:
+      - "8080:8080"
+    # Monta o .env local (se existir) dentro do container para o godotenv carregar
+    volumes:
+      - ./go-backend/.env:/app/.env:ro
+      # (Opcional) Compartilha suas credenciais/profiles AWS locais com o container
+      - ~/.aws:/root/.aws:ro
+
 volumes:
   postgres_data:

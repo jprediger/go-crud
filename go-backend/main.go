@@ -93,5 +93,6 @@ func setupRouter() *gin.Engine {
 
 func main() {
 	r := setupRouter()
-	r.Run()
+	// Força a porta 8080 (compatível com docker-compose e VITE_BACKEND_URL)
+	r.Run(":8080")
 }
